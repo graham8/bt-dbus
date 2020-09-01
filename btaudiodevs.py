@@ -79,20 +79,22 @@ def paired_speakers():
             device_dict = {}
             for key in dbus_dict:
                 device_dict[str(key)] = dbus_dict[key]
-                if 'Name' in key:
-                    print('Name: {}'.format(str(device_dict[str(key)])))
-                if 'Class' in key:
-                    print(describe_class(device_dict[str(key)]))
-                if 'UUIDs' in key:
-                    for UUID in device_dict['UUIDs']:
-                        UUID = UUID[4:8]
-                        if UUID in UUIDs.keys():
-                            print('{}, {}'.format(str(UUID), str(UUIDs[str(UUID)])))
-                        else:
-                            print('{}, {}'.format(str(UUID), 'Unknown'))
-            if 'Icon' in dbus_dict.keys() and dbus_dict['Icon'] == 'audio-card' and dbus_dict['Paired'] == True:
-                devices[str(device_dict['Address'])] = device_dict
-                print('Added to asoundrc')
+            print('')
+            if 'Name' in device_dict:
+                print('Name: {}'.format(str(device_dict['Name'])))
+            if 'Class' in device_dict:
+                print('Device class: {}'.format(', '.join(describe_class(device_dict['Class']))))
+            if 'UUIDs' in device_dict:
+                for UUID in device_dict['UUIDs']:
+                    UUID = UUID[4:8]
+                    if UUID in UUIDs:
+                        print('{}, {}'.format(str(UUID), str(UUIDs[str(UUID)])))
+                    else:
+                        print('{}, {}'.format(str(UUID), 'Unknown'))
+                    # A2DP sink, headset or handsfree  TODO: list each as separate device
+                    if (UUID == '110b' or UUID == '1108' or UUID == '111e') and dbus_dict['Paired'] == True:
+                        devices[str(device_dict['Address'])] = device_dict
+                        print('********Added to asoundrc********')
     return devices
 
 if connman.is_technology_available('bluetooth') == False:
